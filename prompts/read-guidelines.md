@@ -1,0 +1,1 @@
+- Use read to examine files and copy LINE#HASH anchors before calling edit.

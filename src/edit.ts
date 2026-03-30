@@ -99,14 +99,19 @@ const EDIT_DESC = readFileSync(
   "utf-8",
 ).trim();
 
-const EDIT_PROMPT_SNIPPET =
-  "Make precise file edits with LINE#HASH anchors, including multiple disjoint edits in one call";
-const EDIT_PROMPT_GUIDELINES = [
-  "Use edit for precise changes with LINE#HASH anchors from read output.",
-  "When changing multiple separate locations in one file, use one edit call with multiple entries in edits[] instead of multiple edit calls.",
-  "Each edit in edits[] targets anchors from the same pre-edit snapshot. Do not emit overlapping or nested edits. Merge nearby changes into one edit.",
-  "Keep edits as small as possible and copy indentation exactly from read output. Do not pad with large unchanged regions.",
-];
+const EDIT_PROMPT_SNIPPET = readFileSync(
+  new URL("../prompts/edit-snippet.md", import.meta.url),
+  "utf-8",
+).trim();
+
+const EDIT_PROMPT_GUIDELINES = readFileSync(
+  new URL("../prompts/edit-guidelines.md", import.meta.url),
+  "utf-8",
+)
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line.startsWith("- "))
+  .map((line) => line.slice(2));
 
 const ROOT_KEYS = new Set(["path", "edits", "oldText", "newText", "old_text", "new_text"]);
 const ITEM_KEYS = new Set(["op", "pos", "end", "lines"]);

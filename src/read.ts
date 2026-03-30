@@ -25,10 +25,19 @@ const READ_DESC = readFileSync(
   .replaceAll("{{DEFAULT_MAX_BYTES}}", formatSize(DEFAULT_MAX_BYTES))
   .trim();
 
-const READ_PROMPT_SNIPPET = "Read file contents with line-level hash anchors";
-const READ_PROMPT_GUIDELINES = [
-  "Use read to examine files and copy LINE#HASH anchors before calling edit.",
-];
+const READ_PROMPT_SNIPPET = readFileSync(
+  new URL("../prompts/read-snippet.md", import.meta.url),
+  "utf-8",
+).trim();
+
+const READ_PROMPT_GUIDELINES = readFileSync(
+  new URL("../prompts/read-guidelines.md", import.meta.url),
+  "utf-8",
+)
+  .split("\n")
+  .map((line) => line.trim())
+  .filter((line) => line.startsWith("- "))
+  .map((line) => line.slice(2));
 
 function normalizePositiveInteger(
   value: number | undefined,
