@@ -1,7 +1,6 @@
 import type { ExtensionAPI } from "@mariozechner/pi-coding-agent";
 import {
   createReadTool,
-  createReadToolDefinition,
   formatSize,
   DEFAULT_MAX_BYTES,
   DEFAULT_MAX_LINES,
@@ -26,7 +25,10 @@ const READ_DESC = readFileSync(
   .replaceAll("{{DEFAULT_MAX_BYTES}}", formatSize(DEFAULT_MAX_BYTES))
   .trim();
 
-const BUILTIN_READ_DEFINITION = createReadToolDefinition(process.cwd());
+const READ_PROMPT_SNIPPET = "Read file contents with line-level hash anchors";
+const READ_PROMPT_GUIDELINES = [
+  "Use read to examine files and copy LINE#HASH anchors before calling edit.",
+];
 
 function normalizePositiveInteger(
   value: number | undefined,
@@ -104,8 +106,8 @@ export function registerReadTool(pi: ExtensionAPI): void {
     name: "read",
     label: "Read",
     description: READ_DESC,
-    promptSnippet: BUILTIN_READ_DEFINITION.promptSnippet,
-    promptGuidelines: BUILTIN_READ_DEFINITION.promptGuidelines,
+    promptSnippet: READ_PROMPT_SNIPPET,
+    promptGuidelines: READ_PROMPT_GUIDELINES,
     parameters: Type.Object({
       path: Type.String({
         description: "Path to the file to read (relative or absolute)",

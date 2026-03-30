@@ -1,5 +1,4 @@
 import type { EditToolDetails, ExtensionAPI } from "@mariozechner/pi-coding-agent";
-import { createEditToolDefinition } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { constants } from "fs";
 import { readFileSync } from "fs";
@@ -100,7 +99,14 @@ const EDIT_DESC = readFileSync(
   "utf-8",
 ).trim();
 
-const BUILTIN_EDIT_DEFINITION = createEditToolDefinition(process.cwd());
+const EDIT_PROMPT_SNIPPET =
+  "Make precise file edits with LINE#HASH anchors, including multiple disjoint edits in one call";
+const EDIT_PROMPT_GUIDELINES = [
+  "Use edit for precise changes with LINE#HASH anchors from read output.",
+  "When changing multiple separate locations in one file, use one edit call with multiple entries in edits[] instead of multiple edit calls.",
+  "Each edit in edits[] targets anchors from the same pre-edit snapshot. Do not emit overlapping or nested edits. Merge nearby changes into one edit.",
+  "Keep edits as small as possible and copy indentation exactly from read output. Do not pad with large unchanged regions.",
+];
 
 const ROOT_KEYS = new Set(["path", "edits", "oldText", "newText", "old_text", "new_text"]);
 const ITEM_KEYS = new Set(["op", "pos", "end", "lines"]);
@@ -230,8 +236,8 @@ export function registerEditTool(pi: ExtensionAPI): void {
     label: "Edit",
     description: EDIT_DESC,
     parameters: hashlineEditToolSchema,
-    promptSnippet: BUILTIN_EDIT_DEFINITION.promptSnippet,
-    promptGuidelines: BUILTIN_EDIT_DEFINITION.promptGuidelines,
+    promptSnippet: EDIT_PROMPT_SNIPPET,
+    promptGuidelines: EDIT_PROMPT_GUIDELINES,
 
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       assertEditRequest(params);
