@@ -1,4 +1,5 @@
 import type { EditToolDetails, ExtensionAPI } from "@mariozechner/pi-coding-agent";
+import { createEditToolDefinition } from "@mariozechner/pi-coding-agent";
 import { Type } from "@sinclair/typebox";
 import { constants } from "fs";
 import { readFileSync } from "fs";
@@ -98,6 +99,8 @@ const EDIT_DESC = readFileSync(
   new URL("../prompts/edit.md", import.meta.url),
   "utf-8",
 ).trim();
+
+const BUILTIN_EDIT_DEFINITION = createEditToolDefinition(process.cwd());
 
 const ROOT_KEYS = new Set(["path", "edits", "oldText", "newText", "old_text", "new_text"]);
 const ITEM_KEYS = new Set(["op", "pos", "end", "lines"]);
@@ -227,6 +230,8 @@ export function registerEditTool(pi: ExtensionAPI): void {
     label: "Edit",
     description: EDIT_DESC,
     parameters: hashlineEditToolSchema,
+    promptSnippet: BUILTIN_EDIT_DEFINITION.promptSnippet,
+    promptGuidelines: BUILTIN_EDIT_DEFINITION.promptGuidelines,
 
     async execute(_toolCallId, params, signal, _onUpdate, ctx) {
       assertEditRequest(params);
